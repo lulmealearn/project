@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+from matplotlib import ticker
 
 with open("settings.txt", 'r') as settings:
     tmp = [float(i[:-1]) for i in settings.readlines()]
@@ -8,41 +8,42 @@ with open("settings.txt", 'r') as settings:
 dV = tmp[1]
 df = tmp[0]
 
-# collecting data from data file
 data_array = np.loadtxt("data.txt", dtype=int)
-data_array = data_array*dV
+data_array = data_array*(dV)
 
 n = len(data_array)
-T = 1/(df)
+T = (df)
 times = np.linspace(0, T*(n-1), n)
-step = int(n//df)
+step = int(n//df)*2
 
-fig, ax = plt.subplots(figsize=(16, 9))
-ax.plot(times, data_array, color='blue', label='V(t)', linestyle='--', marker='o', markevery=step)
+fig, ax = plt.subplots(figsize=(16, 10))
+ax.plot(times, data_array, color='blue', label='U(t)', linestyle='--', marker='o', markevery=step)
+ax.legend()
+ax.scatter(times[::40], data_array[::40])
 ax.legend()
 
-# set lims
 min_v = data_array.min()
 max_v = data_array.max()
 max_t = T*n
 ax.set_ylim(min_v, 3.3)
 ax.set_xlim(0, max_t)
 
-# micro markers and grid
 plt.minorticks_on()
 plt.grid(which='major')
 plt.grid(which='minor', linestyle=':')
 
-# x, y and graph title
-ax.set_title("Зарядка кондесатора", wrap=True)
-ax.set_ylabel("Напряжение, B")
-ax.set_xlabel("Время, с")
+ax.yaxis.set_major_locator(ticker.MultipleLocator(0.5))
+ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.1))
+ax.xaxis.set_major_locator(ticker.MultipleLocator(2))
+ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.25))
 
-# placing text
+ax.set_title("Процесс заряда и разряда конденсатора в RC-цепочке", wrap=True)
+ax.set_ylabel("Напряжение U, B")
+ax.set_xlabel("Время t, с")
 y = max_v/2
 x = max_t*0.75
 
-ax.text(x, y, f'Время зарядки = {round(max_t, 3)} c')
-
+ax.text(x - 0.5, y, f'Время зарядки = {round(2*384*T, 3)/2} c')
+ax.text(x - 0.5, y - 0.3, f'Время разрядки = {round(2*514*T, 3)/2} c')
 plt.savefig('graph')
 plt.show()
