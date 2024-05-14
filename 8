@@ -1,0 +1,48 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+with open("settings.txt", 'r') as settings:
+    tmp = [float(i[:-1]) for i in settings.readlines()]
+
+dV = tmp[1]
+df = tmp[0]
+
+# collecting data from data file
+data_array = np.loadtxt("data.txt", dtype=int)
+data_array = data_array*dV
+
+n = len(data_array)
+T = 1/(df)
+times = np.linspace(0, T*(n-1), n)
+step = int(n//df)
+
+fig, ax = plt.subplots(figsize=(16, 9))
+ax.plot(times, data_array, color='blue', label='V(t)', linestyle='--', marker='o', markevery=step)
+ax.legend()
+
+# set lims
+min_v = data_array.min()
+max_v = data_array.max()
+max_t = T*n
+ax.set_ylim(min_v, 3.3)
+ax.set_xlim(0, max_t)
+
+# micro markers and grid
+plt.minorticks_on()
+plt.grid(which='major')
+plt.grid(which='minor', linestyle=':')
+
+# x, y and graph title
+ax.set_title("Зарядка кондесатора", wrap=True)
+ax.set_ylabel("Напряжение, B")
+ax.set_xlabel("Время, с")
+
+# placing text
+y = max_v/2
+x = max_t*0.75
+
+ax.text(x, y, f'Время зарядки = {round(max_t, 3)} c')
+
+plt.savefig('graph')
+plt.show()
